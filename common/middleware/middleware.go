@@ -13,6 +13,8 @@ type contextKey string
 const contextKeyUserID contextKey = "user_id"
 
 // UserIDFromHeader extracts the user ID from the Authorization header. Returns an empty string if the header is absent.
+//
+// Deprecated: use UserIDFromRequest instead. A handler reading the header itself returns whatever the caller sent, and silently yields an empty user ID the day its route is no longer wrapped in RequireAuth.
 func UserIDFromHeader(r *http.Request) model.UserID {
 	return model.UserID(strings.TrimSpace(r.Header.Get("Authorization")))
 }

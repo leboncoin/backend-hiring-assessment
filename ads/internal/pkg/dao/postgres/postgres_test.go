@@ -178,3 +178,104 @@ func TestCreateAd(t *testing.T) {
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
+
+func TestTransaction(t *testing.T) {
+	ctx := context.Background()
+	req := adsdao.CreateAdRequest{
+		Title:      "mountain bike",
+		PriceCents: 15000,
+		PhotoURL:   "https://example.com/bike.jpg",
+		OwnerID:    "user-1",
+	}
+
+	t.Run("commits every call made on the transaction", func(t *testing.T) {
+		dao, mock := newMockDAO(t)
+		mock.ExpectBegin()
+		mock.ExpectQuery("INSERT").
+			WithArgs(req.Title, req.PriceCents, req.PhotoURL, string(req.OwnerID)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(1)))
+		mock.ExpectQuery("INSERT").
+			WithArgs(req.Title, req.PriceCents, req.PhotoURL, string(req.OwnerID)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(2)))
+		mock.ExpectCommit()
+
+		tx, err := dao.Begin(ctx)
+		require.NoError(t, err)
+
+		first, err := tx.CreateAd(ctx, req)
+		require.NoError(t, err)
+		second, err := tx.CreateAd(ctx, req)
+		require.NoError(t, err)
+
+		require.NoError(t, tx.Commit())
+		assert.Equal(t, model.AdID(1), first)
+		assert.Equal(t, model.AdID(2), second)
+		require.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("rolls back without committing", func(t *testing.T) {
+		dao, mock := newMockDAO(t)
+		mock.ExpectBegin()
+		mock.ExpectQuery("INSERT").
+			WithArgs(req.Title, req.PriceCents, req.PhotoURL, string(req.OwnerID)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(1)))
+		mock.ExpectRollback()
+
+		tx, err := dao.Begin(ctx)
+		require.NoError(t, err)
+
+		_, err = tx.CreateAd(ctx, req)
+		require.NoError(t, err)
+
+		require.NoError(t, tx.Rollback())
+		require.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("returns error when the transaction cannot be opened", func(t *testing.T) {
+		dao, mock := newMockDAO(t)
+		boom := errors.New("db down")
+		mock.ExpectBegin().WillReturnError(boom)
+
+		tx, err := dao.Begin(ctx)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, boom)
+		assert.Nil(t, tx)
+		require.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("rollback after commit does nothing", func(t *testing.T) {
+		dao, mock := newMockDAO(t)
+		mock.ExpectBegin()
+		mock.ExpectCommit()
+
+		tx, err := dao.Begin(ctx)
+		require.NoError(t, err)
+		require.NoError(t, tx.Commit())
+
+		require.NoError(t, tx.Rollback())
+		require.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("rejects a nested transaction", func(t *testing.T) {
+		dao, mock := newMockDAO(t)
+		mock.ExpectBegin()
+		mock.ExpectRollback()
+
+		tx, err := dao.Begin(ctx)
+		require.NoError(t, err)
+
+		_, nestedErr := tx.(*DAO).Begin(ctx)
+
+		require.Error(t, nestedErr)
+		require.NoError(t, tx.Rollback())
+		require.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("refuses commit and rollback outside a transaction", func(t *testing.T) {
+		dao, _ := newMockDAO(t)
+
+		require.Error(t, dao.Commit())
+		require.Error(t, dao.Rollback())
+	})
+}

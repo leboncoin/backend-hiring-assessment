@@ -100,3 +100,66 @@ func TestMock_CreateAd(t *testing.T) {
 		assert.ErrorIs(t, err, adsdao.ErrUnknownOwner)
 	})
 }
+
+func TestMock_Begin(t *testing.T) {
+	t.Run("returns the mock itself as transaction", func(t *testing.T) {
+		m := mock.New(t)
+
+		m.On("Begin", ctx).Return(nil)
+
+		tx, err := m.Begin(ctx)
+
+		require.NoError(t, err)
+		assert.Same(t, m, tx)
+	})
+
+	t.Run("returns configured error", func(t *testing.T) {
+		m := mock.New(t)
+		boom := errors.New("db down")
+
+		m.On("Begin", ctx).Return(boom)
+
+		tx, err := m.Begin(ctx)
+
+		assert.ErrorIs(t, err, boom)
+		assert.Nil(t, tx)
+	})
+}
+
+func TestMock_Commit(t *testing.T) {
+	t.Run("returns nil on success", func(t *testing.T) {
+		m := mock.New(t)
+
+		m.On("Commit").Return(nil)
+
+		require.NoError(t, m.Commit())
+	})
+
+	t.Run("returns configured error", func(t *testing.T) {
+		m := mock.New(t)
+		boom := errors.New("commit failed")
+
+		m.On("Commit").Return(boom)
+
+		assert.ErrorIs(t, m.Commit(), boom)
+	})
+}
+
+func TestMock_Rollback(t *testing.T) {
+	t.Run("returns nil on success", func(t *testing.T) {
+		m := mock.New(t)
+
+		m.On("Rollback").Return(nil)
+
+		require.NoError(t, m.Rollback())
+	})
+
+	t.Run("returns configured error", func(t *testing.T) {
+		m := mock.New(t)
+		boom := errors.New("rollback failed")
+
+		m.On("Rollback").Return(boom)
+
+		assert.ErrorIs(t, m.Rollback(), boom)
+	})
+}

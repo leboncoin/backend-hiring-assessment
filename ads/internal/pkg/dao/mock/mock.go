@@ -51,3 +51,24 @@ func (m *Mock) CreateAd(ctx context.Context, req adsdao.CreateAdRequest) (model.
 
 	return adID, args.Error(1)
 }
+
+// Begin returns the mock itself as the transaction, so expectations stay set on a single object, and the error set on the mock.
+func (m *Mock) Begin(ctx context.Context) (adsdao.Tx, error) {
+	args := m.Called(ctx)
+
+	if err := args.Error(0); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+// Commit returns the error set on the mock.
+func (m *Mock) Commit() error {
+	return m.Called().Error(0)
+}
+
+// Rollback returns the error set on the mock.
+func (m *Mock) Rollback() error {
+	return m.Called().Error(0)
+}
