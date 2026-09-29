@@ -9,7 +9,7 @@ The API needs an up-and-running postgres database, which can be launched via the
 - Go 1.26 or later
 - Docker with the Compose plugin
 
-## Database
+## Launching the stack
 
 ```bash
 docker compose up -d
@@ -51,7 +51,7 @@ curl -s -X POST http://localhost:8080/ads \
 
 ## Authentication
 
-To pass authentification information to a call, simply add the `Authorization` header with the user ID in plain text.
+To pass authentication information to a call, simply add the `Authorization` header with the user ID in plain text.
 
 It will be extracted by the service.
 
