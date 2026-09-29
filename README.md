@@ -1,6 +1,6 @@
 # Ads API
 
-A small Go HTTP API around a single domain: **ads** (classified ads).
+A small Go HTTP API around a single domain: *ads* (classified ads).
 
 The API needs an up-and-running postgres database, which can be launched via the provided Docker Compose file.
 
