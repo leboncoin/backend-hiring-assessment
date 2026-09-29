@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 )
 
-func adIDFromURL(r *http.Request) (model.AdID, error) {
+func adIDFromURL(r *http.Request) (domain.AdID, error) {
 	raw := r.PathValue("adID")
 
 	id, err := strconv.ParseInt(raw, 10, 64)
@@ -17,7 +17,7 @@ func adIDFromURL(r *http.Request) (model.AdID, error) {
 		return 0, fmt.Errorf("ad id %q is not a number", raw)
 	}
 
-	return model.AdID(id), nil
+	return domain.AdID(id), nil
 }
 
 func decodeBody(r *http.Request, target any) error {

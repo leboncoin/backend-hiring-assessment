@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao/mock"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao/mock"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 func TestListAds(t *testing.T) {
@@ -19,7 +19,7 @@ func TestListAds(t *testing.T) {
 	t.Run("nominal", func(t *testing.T) {
 		t.Run("returns all matching ads", func(t *testing.T) {
 			m := mock.New(t)
-			want := []model.Ad{
+			want := []domain.Ad{
 				{ID: 1, Title: "bike", Price: 5000, UserID: "user-1"},
 				{ID: 2, Title: "scooter", Price: 12000, UserID: "user-2"},
 			}

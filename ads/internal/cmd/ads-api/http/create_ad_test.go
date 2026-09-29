@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/common/middleware"
 )
 
@@ -47,8 +47,8 @@ func TestHandlerCreateAd(t *testing.T) {
 	}
 
 	t.Run("returns 201 with ID on success", func(t *testing.T) {
-		srv := newCreateAdServer(func(_ context.Context, req usecase.CreateAdRequest) (model.AdID, error) {
-			return model.AdID(7), nil
+		srv := newCreateAdServer(func(_ context.Context, req usecase.CreateAdRequest) (domain.AdID, error) {
+			return domain.AdID(7), nil
 		})
 		defer srv.Close()
 
@@ -65,9 +65,9 @@ func TestHandlerCreateAd(t *testing.T) {
 
 	t.Run("passes authenticated user ID as owner to the usecase", func(t *testing.T) {
 		var received usecase.CreateAdRequest
-		srv := newCreateAdServer(func(_ context.Context, req usecase.CreateAdRequest) (model.AdID, error) {
+		srv := newCreateAdServer(func(_ context.Context, req usecase.CreateAdRequest) (domain.AdID, error) {
 			received = req
-			return model.AdID(1), nil
+			return domain.AdID(1), nil
 		})
 		defer srv.Close()
 
@@ -75,14 +75,14 @@ func TestHandlerCreateAd(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Equal(t, http.StatusCreated, resp.StatusCode)
-		assert.Equal(t, model.UserID("user-42"), received.OwnerID)
+		assert.Equal(t, domain.UserID("user-42"), received.OwnerID)
 		assert.Equal(t, "mountain bike", received.Title)
 		assert.Equal(t, int64(15000), received.PriceCents)
 		assert.Equal(t, "https://example.com/bike.jpg", received.PhotoURL)
 	})
 
 	t.Run("returns 401 when Authorization header is missing", func(t *testing.T) {
-		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (model.AdID, error) {
+		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (domain.AdID, error) {
 			t.Fatal("usecase should not be called")
 			return 0, nil
 		})
@@ -95,7 +95,7 @@ func TestHandlerCreateAd(t *testing.T) {
 	})
 
 	t.Run("returns 400 when body is invalid JSON", func(t *testing.T) {
-		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (model.AdID, error) {
+		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (domain.AdID, error) {
 			t.Fatal("usecase should not be called")
 			return 0, nil
 		})
@@ -114,7 +114,7 @@ func TestHandlerCreateAd(t *testing.T) {
 	})
 
 	t.Run("returns 500 when the usecase errors", func(t *testing.T) {
-		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (model.AdID, error) {
+		srv := newCreateAdServer(func(_ context.Context, _ usecase.CreateAdRequest) (domain.AdID, error) {
 			return 0, errors.New("db down")
 		})
 		defer srv.Close()

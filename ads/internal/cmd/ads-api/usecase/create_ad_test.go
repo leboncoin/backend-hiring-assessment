@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao/mock"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao/mock"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 func TestCreateAd(t *testing.T) {
@@ -31,18 +31,18 @@ func TestCreateAd(t *testing.T) {
 
 	t.Run("nominal", func(t *testing.T) {
 		m := mock.New(t)
-		m.On("CreateAd", ctx, daoReq).Return(model.AdID(7), nil)
+		m.On("CreateAd", ctx, daoReq).Return(domain.AdID(7), nil)
 
 		got, err := usecase.NewCreateAdFunc(m)(ctx, ucReq)
 
 		require.NoError(t, err)
-		assert.Equal(t, model.AdID(7), got)
+		assert.Equal(t, domain.AdID(7), got)
 	})
 
 	t.Run("error from dao", func(t *testing.T) {
 		m := mock.New(t)
 		dbErr := errors.New("connection reset")
-		m.On("CreateAd", ctx, daoReq).Return(model.AdID(0), dbErr)
+		m.On("CreateAd", ctx, daoReq).Return(domain.AdID(0), dbErr)
 
 		_, err := usecase.NewCreateAdFunc(m)(ctx, ucReq)
 

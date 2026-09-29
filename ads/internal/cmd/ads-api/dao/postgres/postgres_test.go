@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 )
 
 var adCols = []string{"id", "title", "price_cents", "photo_url", "user_id", "created_at"}
@@ -41,10 +41,10 @@ func TestSearchAds(t *testing.T) {
 
 		require.NoError(t, err)
 		require.Len(t, got, 2)
-		assert.Equal(t, model.AdID(1), got[0].ID)
+		assert.Equal(t, domain.AdID(1), got[0].ID)
 		assert.Equal(t, "bike", got[0].Title)
 		assert.Equal(t, int64(5000), got[0].Price)
-		assert.Equal(t, model.AdID(2), got[1].ID)
+		assert.Equal(t, domain.AdID(2), got[1].ID)
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 
@@ -91,10 +91,10 @@ func TestGetAdByID(t *testing.T) {
 		got, err := dao.GetAdByID(ctx, 42)
 
 		require.NoError(t, err)
-		assert.Equal(t, model.AdID(42), got.ID)
+		assert.Equal(t, domain.AdID(42), got.ID)
 		assert.Equal(t, "mountain bike", got.Title)
 		assert.Equal(t, int64(15000), got.Price)
-		assert.Equal(t, model.UserID("user-1"), got.UserID)
+		assert.Equal(t, domain.UserID("user-1"), got.UserID)
 		assert.Equal(t, createdAt, got.CreatedAt)
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
@@ -145,7 +145,7 @@ func TestCreateAd(t *testing.T) {
 		got, err := dao.CreateAd(ctx, req)
 
 		require.NoError(t, err)
-		assert.Equal(t, model.AdID(7), got)
+		assert.Equal(t, domain.AdID(7), got)
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 
@@ -208,8 +208,8 @@ func TestTransaction(t *testing.T) {
 		require.NoError(t, err)
 
 		require.NoError(t, tx.Commit())
-		assert.Equal(t, model.AdID(1), first)
-		assert.Equal(t, model.AdID(2), second)
+		assert.Equal(t, domain.AdID(1), first)
+		assert.Equal(t, domain.AdID(2), second)
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 

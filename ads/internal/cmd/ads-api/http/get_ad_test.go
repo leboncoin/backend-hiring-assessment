@@ -11,9 +11,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 func newGetAdServer(fn usecase.GetAdByIDFunc) *httptest.Server {
@@ -27,7 +27,7 @@ func TestHandlerGetAd(t *testing.T) {
 	createdAt := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
 
 	t.Run("returns 200 with ad JSON on success", func(t *testing.T) {
-		ad := model.Ad{
+		ad := domain.Ad{
 			ID:        42,
 			Title:     "mountain bike",
 			Price:     15000,
@@ -35,7 +35,7 @@ func TestHandlerGetAd(t *testing.T) {
 			UserID:    "user-1",
 			CreatedAt: createdAt,
 		}
-		srv := newGetAdServer(func(_ context.Context, id model.AdID) (model.Ad, error) {
+		srv := newGetAdServer(func(_ context.Context, id domain.AdID) (domain.Ad, error) {
 			return ad, nil
 		})
 		defer srv.Close()
@@ -58,9 +58,9 @@ func TestHandlerGetAd(t *testing.T) {
 	})
 
 	t.Run("returns 400 when adID is not a number", func(t *testing.T) {
-		srv := newGetAdServer(func(_ context.Context, _ model.AdID) (model.Ad, error) {
+		srv := newGetAdServer(func(_ context.Context, _ domain.AdID) (domain.Ad, error) {
 			t.Fatal("usecase should not be called")
-			return model.Ad{}, nil
+			return domain.Ad{}, nil
 		})
 		defer srv.Close()
 
@@ -72,8 +72,8 @@ func TestHandlerGetAd(t *testing.T) {
 	})
 
 	t.Run("returns 404 when ad does not exist", func(t *testing.T) {
-		srv := newGetAdServer(func(_ context.Context, _ model.AdID) (model.Ad, error) {
-			return model.Ad{}, adsdao.ErrNotFound
+		srv := newGetAdServer(func(_ context.Context, _ domain.AdID) (domain.Ad, error) {
+			return domain.Ad{}, adsdao.ErrNotFound
 		})
 		defer srv.Close()
 
@@ -85,8 +85,8 @@ func TestHandlerGetAd(t *testing.T) {
 	})
 
 	t.Run("returns 500 on unexpected usecase error", func(t *testing.T) {
-		srv := newGetAdServer(func(_ context.Context, _ model.AdID) (model.Ad, error) {
-			return model.Ad{}, errors.New("db down")
+		srv := newGetAdServer(func(_ context.Context, _ domain.AdID) (domain.Ad, error) {
+			return domain.Ad{}, errors.New("db down")
 		})
 		defer srv.Close()
 
@@ -98,10 +98,10 @@ func TestHandlerGetAd(t *testing.T) {
 	})
 
 	t.Run("passes the correct ad ID to the usecase", func(t *testing.T) {
-		var receivedID model.AdID
-		srv := newGetAdServer(func(_ context.Context, id model.AdID) (model.Ad, error) {
+		var receivedID domain.AdID
+		srv := newGetAdServer(func(_ context.Context, id domain.AdID) (domain.Ad, error) {
 			receivedID = id
-			return model.Ad{ID: id}, nil
+			return domain.Ad{ID: id}, nil
 		})
 		defer srv.Close()
 
@@ -110,6 +110,6 @@ func TestHandlerGetAd(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		assert.Equal(t, model.AdID(7), receivedID)
+		assert.Equal(t, domain.AdID(7), receivedID)
 	})
 }

@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 )
 
 type (
 	// ListAdsFunc returns all ads matching the filters.
-	ListAdsFunc func(ctx context.Context, req ListAdsRequest) ([]model.Ad, error)
+	ListAdsFunc func(ctx context.Context, req ListAdsRequest) ([]domain.Ad, error)
 
 	// ListAdsRequest describes which ads to return.
 	ListAdsRequest struct {
-		OwnerID       model.UserID
+		OwnerID       domain.UserID
 		MinPriceCents int64
 		MaxPriceCents int64
 		Title         string
@@ -30,7 +30,7 @@ func NewListAdsFunc(adDAO adsdao.DAO) ListAdsFunc {
 	return listAds{adDAO: adDAO}.listAds
 }
 
-func (uc listAds) listAds(ctx context.Context, req ListAdsRequest) ([]model.Ad, error) {
+func (uc listAds) listAds(ctx context.Context, req ListAdsRequest) ([]domain.Ad, error) {
 	ads, err := uc.adDAO.SearchAds(ctx, adsdao.SearchAdsRequest{
 		OwnerID:       req.OwnerID,
 		MinPriceCents: req.MinPriceCents,

@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/port/http"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao/postgres"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/http"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao/postgres"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/common/httpserver"
 )
 

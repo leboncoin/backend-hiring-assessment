@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	_ "github.com/jackc/pgx/v5/stdlib" // registers the "pgx" database/sql driver
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 )
 
 const adColumns = `id, title, price_cents, photo_url, user_id::text, created_at`
@@ -108,7 +108,7 @@ func (d *DAO) Rollback() error {
 }
 
 // SearchAds returns all ads matching the filters.
-func (d *DAO) SearchAds(ctx context.Context, req adsdao.SearchAdsRequest) ([]model.Ad, error) {
+func (d *DAO) SearchAds(ctx context.Context, req adsdao.SearchAdsRequest) ([]domain.Ad, error) {
 	const query = `
 		SELECT ` + adColumns + `
 		FROM ads
@@ -128,9 +128,9 @@ func (d *DAO) SearchAds(ctx context.Context, req adsdao.SearchAdsRequest) ([]mod
 	}
 	defer func() { _ = rows.Close() }()
 
-	var ads []model.Ad
+	var ads []domain.Ad
 	for rows.Next() {
-		var ad model.Ad
+		var ad domain.Ad
 		if err := rows.Scan(&ad.ID, &ad.Title, &ad.Price, &ad.PhotoURL, &ad.UserID, &ad.CreatedAt); err != nil {
 			return nil, fmt.Errorf("unable to scan ad: %w", err)
 		}
@@ -146,25 +146,25 @@ func (d *DAO) SearchAds(ctx context.Context, req adsdao.SearchAdsRequest) ([]mod
 }
 
 // GetAdByID returns a single ad, or dao.ErrNotFound.
-func (d *DAO) GetAdByID(ctx context.Context, id model.AdID) (model.Ad, error) {
+func (d *DAO) GetAdByID(ctx context.Context, id domain.AdID) (domain.Ad, error) {
 	const query = `SELECT ` + adColumns + ` FROM ads WHERE id = $1`
 
 	ad, err := scanAd(d.runner().QueryRowContext(ctx, query, int64(id)))
 	if err != nil {
-		return model.Ad{}, fmt.Errorf("unable to get ad: %w", err)
+		return domain.Ad{}, fmt.Errorf("unable to get ad: %w", err)
 	}
 
 	return ad, nil
 }
 
 // CreateAd inserts an ad and returns its generated identifier.
-func (d *DAO) CreateAd(ctx context.Context, req adsdao.CreateAdRequest) (model.AdID, error) {
+func (d *DAO) CreateAd(ctx context.Context, req adsdao.CreateAdRequest) (domain.AdID, error) {
 	const query = `
 		INSERT INTO ads (title, price_cents, photo_url, user_id)
 		VALUES ($1, $2, $3, $4::uuid)
 		RETURNING id`
 
-	var id model.AdID
+	var id domain.AdID
 	err := d.runner().QueryRowContext(ctx, query, req.Title, req.PriceCents, req.PhotoURL, string(req.OwnerID)).Scan(&id)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -178,14 +178,14 @@ func (d *DAO) CreateAd(ctx context.Context, req adsdao.CreateAdRequest) (model.A
 	return id, nil
 }
 
-func scanAd(row *sql.Row) (model.Ad, error) {
-	var ad model.Ad
+func scanAd(row *sql.Row) (domain.Ad, error) {
+	var ad domain.Ad
 	if err := row.Scan(&ad.ID, &ad.Title, &ad.Price, &ad.PhotoURL, &ad.UserID, &ad.CreatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return model.Ad{}, adsdao.ErrNotFound
+			return domain.Ad{}, adsdao.ErrNotFound
 		}
 
-		return model.Ad{}, err
+		return domain.Ad{}, err
 	}
 
 	return ad, nil

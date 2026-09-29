@@ -34,7 +34,7 @@ There are 2 entities in this sample:
 
 ```bash
 # Health check
-curl -s http://localhost:8080/health
+curl -s -v http://localhost:8080/health
 
 # List ads (with optional filters)
 curl -s 'http://localhost:8080/ads?title=bike&min_price_cents=1000'
@@ -57,4 +57,12 @@ It will be extracted by the service.
 
 ```
 Authorization: 00000000-0000-0000-0000-000000000001
+```
+
+## Tests
+
+To launch all the tests:
+
+```shell
+go test ./...
 ```

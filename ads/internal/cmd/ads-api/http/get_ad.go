@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 type getAdResponse struct {
@@ -20,7 +20,7 @@ type getAdResponse struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
-func adToGetAdResponse(a model.Ad) getAdResponse {
+func adToGetAdResponse(a domain.Ad) getAdResponse {
 	return getAdResponse{
 		ID:         int64(a.ID),
 		Title:      a.Title,

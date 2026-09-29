@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 type listAdsItem struct {
@@ -23,7 +23,7 @@ type listAdsResponse struct {
 	Ads []listAdsItem `json:"ads"`
 }
 
-func adToListAdsItem(a model.Ad) listAdsItem {
+func adToListAdsItem(a domain.Ad) listAdsItem {
 	return listAdsItem{
 		ID:         int64(a.ID),
 		Title:      a.Title,
@@ -43,7 +43,7 @@ func handlerListAds(listAds usecase.ListAdsFunc) http.HandlerFunc {
 		}
 
 		if raw := q.Get("user_id"); raw != "" {
-			ownerID := model.UserID(raw)
+			ownerID := domain.UserID(raw)
 			req.OwnerID = ownerID
 		}
 

@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao"
+	mockdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/dao/mock"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/domain"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/cmd/ads-api/usecase"
-	adsdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao"
-	mockdao "github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/dao/mock"
-	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/ads/internal/pkg/model"
 )
 
 func TestGetAdByID(t *testing.T) {
@@ -19,7 +19,7 @@ func TestGetAdByID(t *testing.T) {
 
 	t.Run("nominal", func(t *testing.T) {
 		m := mockdao.New(t)
-		want := model.Ad{ID: 42, Title: "bike", Price: 5000, UserID: "user-1"}
+		want := domain.Ad{ID: 42, Title: "bike", Price: 5000, UserID: "user-1"}
 		m.On("GetAdByID", ctx, mock.Anything).Return(want, nil)
 
 		got, err := usecase.NewGetAdByIDFunc(m)(ctx, 42)
@@ -30,7 +30,7 @@ func TestGetAdByID(t *testing.T) {
 
 	t.Run("error no ad found", func(t *testing.T) {
 		m := mockdao.New(t)
-		m.On("GetAdByID", ctx, mock.Anything).Return(model.Ad{}, adsdao.ErrNotFound)
+		m.On("GetAdByID", ctx, mock.Anything).Return(domain.Ad{}, adsdao.ErrNotFound)
 
 		_, err := usecase.NewGetAdByIDFunc(m)(ctx, 99)
 
@@ -41,7 +41,7 @@ func TestGetAdByID(t *testing.T) {
 	t.Run("error from dao", func(t *testing.T) {
 		m := mockdao.New(t)
 		dbErr := errors.New("connection reset")
-		m.On("GetAdByID", ctx, mock.Anything).Return(model.Ad{}, dbErr)
+		m.On("GetAdByID", ctx, mock.Anything).Return(domain.Ad{}, dbErr)
 
 		_, err := usecase.NewGetAdByIDFunc(m)(ctx, 1)
 

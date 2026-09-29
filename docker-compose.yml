@@ -26,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./ads/internal/pkg/dao/postgres/migrations:/docker-entrypoint-initdb.d:ro
+      - ./ads/internal/cmd/ads-api/dao/postgres/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ads -d ads"]
       interval: 2s
