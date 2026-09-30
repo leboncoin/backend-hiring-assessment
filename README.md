@@ -1,3 +1,7 @@
+# Hiring instructions
+
+Please refer to [these instructions](INSTRUCTIONS.md).
+
 # Ads API
 
 A small Go HTTP API around a single domain: *ads* (classified ads).

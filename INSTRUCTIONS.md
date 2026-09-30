@@ -1,6 +1,6 @@
 # Way of working
 
-This repository is read-only, fork it and work on your copy just as you would on a live one. \
+This repository is read-only, click on "Use this template" => "Create a new repository" and work on your copy just as you would on a live one. \
 Once you are satisfied with your work, please send us your repository url.
 
 # Overview
