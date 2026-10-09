@@ -19,9 +19,9 @@ Here is the list of things to do:
 
 3) In the `GetAdByID` endpoint, add the username field based on the information found in the user service. Use the provided client in `users/pkg/client.go`.
 
-4) Users are reporting that the `list_ads` endpoint is very slow when using the `user_id` filter, implement a fix.
+4) Users are reporting that the bulk import is not working properly, it fails sometimes and when they try to run again, some ads appear twice, implement a fix.
 
-5) Users are reporting that the bulk import is not working properly, it fails sometimes and when they try to run again, some ads appear twice, implement a fix.
+5) A user can now publish at most 5 ads per rolling 24 hours through `POST /ads`, implement this quota.
 
 The complexity is more or less increasing with each item, do not beat yourself up if you miss some things.
 
