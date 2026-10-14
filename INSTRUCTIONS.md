@@ -10,6 +10,10 @@ The scope you own is found under `/ads`. \
 You can also modify what is found under `/common`. \
 Do not change any code under `/users`.
 
+Consider the ad service to be user facing. \
+Clients are both web and mobile applications. \
+Consider that ad writes are relatively sparse, but the ad reads endpoints are under heavy load (more read than write).
+
 # Instructions
 
 Here is the list of things to do:
@@ -19,9 +23,11 @@ Here is the list of things to do:
 
 3) In the `GetAdByID` endpoint, add the username field based on the information found in the user service. Use the provided client in `users/pkg/client.go`.
 
-4) Users are reporting that the bulk import is not working properly, it fails sometimes and when they try to run again, some ads appear twice, implement a fix.
+4) Stakeholders want the field `price_cents` renamed to `price` in the API. What do you do.
 
-5) A user can now publish at most 5 ads per rolling 24 hours through `POST /ads`, implement this quota.
+5) Users are reporting that the bulk import is not working properly, it fails sometimes and when they try to run again, some ads appear twice, implement a fix.
+
+6) A user can now publish at most 5 ads per rolling 24 hours through `POST /ads`, implement this quota. It does not apply to the bulk import.
 
 The complexity is more or less increasing with each item, do not beat yourself up if you miss some things.
 
