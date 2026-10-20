@@ -1,3 +1,8 @@
+# Way of working
+
+This repository is read-only, click on "Use this template" => "Create a new repository" and work on your copy just as you would on a live one. \
+Once you are satisfied with your work, please send us your repository url.
+
 # Hiring instructions
 
 Please refer to [these instructions](INSTRUCTIONS.md).
