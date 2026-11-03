@@ -12,6 +12,12 @@ import (
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/users/pkg/mock"
 )
 
+func TestMock(t *testing.T) {
+	t.Run("mock implements UserClient", func(t *testing.T) {
+		assert.Implements(t, (*usersclient.UserClient)(nil), new(mock.Mock))
+	})
+}
+
 func TestMockListUsers(t *testing.T) {
 	ctx := context.Background()
 

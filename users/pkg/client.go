@@ -13,6 +13,6 @@ type UserClient interface {
 
 // User represents a user returned by the identity service.
 type User struct {
-	UserID   model.UserID `json:"user_id"`
-	Nickname string       `json:"nickname"`
+	UserID   model.UserID
+	Nickname string
 }

@@ -2,13 +2,13 @@ package api_test
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/users/pkg"
 	"github.mpi-internal.com/leboncoin/backend-hiring-assessment/users/pkg/api"
 )
 
@@ -18,18 +18,27 @@ func newUsersServer(mux *http.ServeMux) (*httptest.Server, *api.Client) {
 	return srv, client
 }
 
+func TestUserClientImplementations(t *testing.T) {
+	t.Run("api client implements UserClient", func(t *testing.T) {
+		assert.Implements(t, (*pkg.UserClient)(nil), new(api.Client))
+	})
+}
+
 func TestClientListUsers(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("returns all users on success", func(t *testing.T) {
-		want := []api.User{
+		want := []pkg.User{
 			{UserID: "00000000-0000-0000-0000-000000000001", Nickname: "alice"},
 			{UserID: "00000000-0000-0000-0000-000000000002", Nickname: "bob"},
 		}
 		mux := http.NewServeMux()
 		mux.HandleFunc("GET /v1/users", func(rw http.ResponseWriter, _ *http.Request) {
 			rw.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(rw).Encode(want)
+			_, _ = rw.Write([]byte(`[
+				{"user_id": "00000000-0000-0000-0000-000000000001", "nickname": "alice"},
+				{"user_id": "00000000-0000-0000-0000-000000000002", "nickname": "bob"}
+			]`))
 		})
 		srv, client := newUsersServer(mux)
 		defer srv.Close()
@@ -73,12 +82,12 @@ func TestClientGetUserByID(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("returns the user on success", func(t *testing.T) {
-		want := api.User{UserID: "00000000-0000-0000-0000-000000000001", Nickname: "alice"}
+		want := pkg.User{UserID: "00000000-0000-0000-0000-000000000001", Nickname: "alice"}
 		mux := http.NewServeMux()
 		mux.HandleFunc("GET /v1/users/{userID}", func(rw http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, "00000000-0000-0000-0000-000000000001", r.PathValue("userID"))
 			rw.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(rw).Encode(want)
+			_, _ = rw.Write([]byte(`{"user_id": "00000000-0000-0000-0000-000000000001", "nickname": "alice"}`))
 		})
 		srv, client := newUsersServer(mux)
 		defer srv.Close()
