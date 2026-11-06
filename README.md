@@ -1,6 +1,7 @@
 # Way of working
 
 This repository is read-only, click on "Use this template" => "Create a new repository" and work on your copy just as you would on a live one. \
+Please make sure the first commit on your repo is the fresh copy of the original repository, please start your work from the second commit only. \
 Once you are satisfied with your work, please send your public repository url to the hiring manager.
 
 # Hiring instructions
